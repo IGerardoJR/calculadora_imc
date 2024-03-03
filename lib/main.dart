@@ -89,7 +89,7 @@ class _MyAppState extends State<MyApp>{
                     ),
                   ),
                   onPressed: () => {
-                    print('Edad: $_edad y Peso: $_peso')
+                    print('Edad: $_edad + Peso: $_peso y altura de: ${formatoDecimal.format(_valorSlider)} cm')
                   },
                   child: const Text('Calcular', style: TextStyle(color:Colors.white),)
                 ),
