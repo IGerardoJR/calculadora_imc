@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  dart_quote:
+    dependency: "direct main"
+    description:
+      name: dart_quote
+      sha256: "86333e1acce5e1120b731251ac7e4bff6d2c2af037e511f469210cba6590f29a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   fake_async:
     dependency: transitive
     description:
@@ -218,3 +226,4 @@ packages:
     version: "13.0.0"
 sdks:
   dart: ">=3.3.0 <4.0.0"
+  flutter: ">=1.17.0"

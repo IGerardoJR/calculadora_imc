@@ -1,13 +1,30 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+// Pages
+import './pages/resultados.dart';
 
 void main(List<String> args) {
-  runApp(MyApp());
+  runApp(MaterialApp(
+    initialRoute: '/',
+    routes: {
+      '/resultados' : (context) => ResultadosPage()
+    },
+    home: MyApp(),
+  )
+
+  );
 }
 
 class MyApp extends StatefulWidget{
   MyApp({Key? key});
+  // Getters
+  double? obtenerImc(){
+    return _MyAppState.valorImc!;
+  }
+  String? obtenerVeredicto(){
+    return _MyAppState.veredicto!;
+  }
 
   @override
   State<StatefulWidget> createState() => _MyAppState();
@@ -15,10 +32,15 @@ class MyApp extends StatefulWidget{
 
 class _MyAppState extends State<MyApp>{
   double? _deviceWidth, _deviceHeight;
-  double _valorSlider = 0;
-  double _edad = 10.0;
-  double _peso = 25.0;
+  double _valorSlider = 150.0;
+  double _edad = 30.0;
+  double _peso = 80.0;
+  String? _genero = "Hombre";
+  double? _opacidadHombre = 1.0;
+  double? _opacidadMujer = 0.65;
   NumberFormat formatoDecimal = NumberFormat("##.#");
+  static double? valorImc = 0;
+ static String? veredicto = "NA";
   // Funciones para el manejo de datos.
   // Aumentar
   void aumentarValor({required String llamadoPor}){
@@ -40,12 +62,38 @@ class _MyAppState extends State<MyApp>{
       }
     });
   }
+
+  // Calcular el imc
+
+  // Formula = peso en kg / (altura * altura en metros)
+  void calcularImc(double peso, double altura){
+    double? imc;
+    double alturaMetros = altura / 100;
+    imc = peso / (alturaMetros * alturaMetros);
+    valorImc  = double.parse(formatoDecimal.format(imc));
+    if(valorImc! < 18.5){
+      veredicto = "Inferior al peso normal";
+    }else if(valorImc! >= 18.5 && valorImc! <= 24.9){
+      veredicto = "Normal";
+    }else if(valorImc! >= 25 && valorImc! <= 29.9){
+      veredicto = "Sobrepeso";
+    }else if(valorImc! >= 30 && valorImc! <= 34.9){
+      veredicto = "Obesidad morbida clase 1";
+    }else if(valorImc! >= 35 && valorImc! <= 39.9){
+      veredicto = "Obesidad morbida clase 2";
+    }else if(valorImc! >= 40){
+      veredicto = "Obesidad morbida clase 3";
+    }
+  }
   @override
   Widget build(BuildContext context) {
     _deviceWidth = MediaQuery.of(context).size.width;
     _deviceHeight = MediaQuery.of(context).size.height;
     // TODO: implement build
     return MaterialApp(
+      theme: ThemeData.light(
+        useMaterial3: true,
+      ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
@@ -58,13 +106,15 @@ class _MyAppState extends State<MyApp>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              const Text('Selecciona tu genero!', style: TextStyle(color:Colors.black, fontWeight: FontWeight.w500, fontSize: 18),),
+
               Padding(
                 padding:EdgeInsets.only(top:0),
                  child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                  _widgetGenero("Hombre",Icons.man),
-                    _widgetGenero("Mujer",Icons.woman)
+                  _widgetGeneroHombre(),
+                    _widgetGeneroMujer()
                   ],
                 ),
               ),
@@ -89,7 +139,9 @@ class _MyAppState extends State<MyApp>{
                     ),
                   ),
                   onPressed: () => {
-                    print('Edad: $_edad + Peso: $_peso y altura de: ${formatoDecimal.format(_valorSlider)} cm')
+                    calcularImc(_peso, _valorSlider),
+                    Navigator.pushNamed(context, '/resultados')
+
                   },
                   child: const Text('Calcular', style: TextStyle(color:Colors.white),)
                 ),
@@ -101,26 +153,81 @@ class _MyAppState extends State<MyApp>{
     );
   }
 
+
+
 //   Widgets personalizos
-Widget _widgetGenero(String textoGenero, IconData icono){
-    return Container(
-      decoration: BoxDecoration(
-          color:Color.fromRGBO(139, 176, 230, 1.0),
-        borderRadius: BorderRadius.circular(10)
-      ),
-      width: _deviceWidth! * 0.45,
-      height: _deviceHeight! * 0.25,
+Widget _widgetGeneroHombre(){
+      return Opacity(
+        opacity: _opacidadHombre!,
+        child: TextButton(
+          onPressed: () => {
+            setState(() {
+          _opacidadMujer = 0.65;
+          _opacidadHombre = 1.0;
+          _genero = "Hombre";
+            })
+          },
 
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Icon(icono, color: Colors.white,size: 50,),
-          Text("$textoGenero",style: TextStyle(color:Colors.white, fontSize: 18),)
-        ],
+          child: Container(
+            decoration: BoxDecoration(
+                color:Color.fromRGBO(139, 176, 230, 1.0),
+              borderRadius: BorderRadius.circular(10),
+              border:Border.all(
+                color: Colors.red,
+                width: 2
+              )
+            ),
+            width: _deviceWidth! * 0.40,
+            height: _deviceHeight! * 0.25,
 
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Icon(Icons.man_2, color: Colors.white,size: 50,),
+                Text("Hombre",style: TextStyle(color:Colors.white, fontSize: 18),)
+              ],
+            ),
+              ),
+        ),
+      );
+}
+
+  Widget _widgetGeneroMujer(){
+    return Opacity(
+      opacity: _opacidadMujer!,
+      child: TextButton(
+        onPressed: () => {
+          setState(() {
+        _opacidadMujer = 1.0;
+        _opacidadHombre = 0.65;
+        _genero = "Mujer";
+          })
+
+        },
+
+        child: Container(
+          decoration: BoxDecoration(
+              color:Color.fromRGBO(139, 176, 230, 1.0),
+              borderRadius: BorderRadius.circular(10),
+              border:Border.all(
+                  color: Colors.pink,
+                  width: 2
+              )
+          ),
+          width: _deviceWidth! * 0.40,
+          height: _deviceHeight! * 0.25,
+
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Icon(Icons.woman, color: Colors.white,size: 50,),
+              Text("Mujer",style: TextStyle(color:Colors.white, fontSize: 18),)
+            ],
+          ),
+        ),
       ),
     );
-}
+  }
 
 Widget _widgetSlider(){
       return Container(
@@ -147,7 +254,6 @@ Widget _widgetSlider(){
                   onChanged: (_) => {
                     setState(() {
                       _valorSlider = _;
-
                     })
                   })
             ],
@@ -220,6 +326,5 @@ Widget _widgetDatos({required String edadPeso}){
       ),
 
     );
-
 }
 }
