@@ -13,7 +13,6 @@ class ResultadosPage extends StatelessWidget{
   ResultadosPage({Key? key});
   @override
   Widget build(BuildContext context) {
-    var clasePrincipal = new MyApp();
     _deviceWidth = MediaQuery.of(context).size.width;
     _deviceHeight = MediaQuery.of(context).size.height;
     // TODO: implement build

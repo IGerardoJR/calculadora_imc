@@ -6,6 +6,7 @@ import './pages/resultados.dart';
 
 void main(List<String> args) {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     initialRoute: '/',
     routes: {
       '/resultados' : (context) => ResultadosPage()
